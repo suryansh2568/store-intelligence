@@ -1,0 +1,165 @@
+{
+  "stores": [
+    {
+      "store_id": "STORE_BLR_002",
+      "name": "Brigade Bangalore",
+      "city": "Bangalore",
+      "address": "Brigade Road",
+      "zones": [
+        {
+          "zone_id": "MAYBELLINE",
+          "name": "Maybelline Section",
+          "bbox": [0.05, 0.1, 0.25, 0.35],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "makeup"
+        },
+        {
+          "zone_id": "LAKME",
+          "name": "Lakme Section",
+          "bbox": [0.25, 0.1, 0.45, 0.35],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "makeup"
+        },
+        {
+          "zone_id": "FACES",
+          "name": "Faces Canada Section",
+          "bbox": [0.45, 0.1, 0.65, 0.35],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "makeup"
+        },
+        {
+          "zone_id": "MARS_NYBAE",
+          "name": "Mars + NY Bae Section",
+          "bbox": [0.65, 0.1, 0.85, 0.35],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "makeup"
+        },
+        {
+          "zone_id": "ALPS_GOODNESS",
+          "name": "Alps Goodness Section",
+          "bbox": [0.05, 0.35, 0.25, 0.6],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "LOREAL",
+          "name": "L'Oreal Section",
+          "bbox": [0.25, 0.35, 0.45, 0.6],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "makeup"
+        },
+        {
+          "zone_id": "BEAUTY_ESSENTIALS",
+          "name": "Beauty Essentials Section",
+          "bbox": [0.45, 0.35, 0.65, 0.6],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "accessories"
+        },
+        {
+          "zone_id": "ACCESSORIES",
+          "name": "Accessories Section",
+          "bbox": [0.65, 0.35, 0.85, 0.6],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "accessories"
+        },
+        {
+          "zone_id": "AQUALOGICA",
+          "name": "Aqualogica Section",
+          "bbox": [0.05, 0.6, 0.25, 0.85],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "TFS",
+          "name": "The Face Shop Section",
+          "bbox": [0.25, 0.6, 0.45, 0.85],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "GOOD_VIBES",
+          "name": "Good Vibes Section",
+          "bbox": [0.45, 0.6, 0.65, 0.85],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "DERMDOC",
+          "name": "DermDoc Section",
+          "bbox": [0.65, 0.6, 0.75, 0.85],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "FOXTALE",
+          "name": "Foxtale Section",
+          "bbox": [0.75, 0.6, 0.85, 0.85],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "MINIMALIST",
+          "name": "Minimalist Section",
+          "bbox": [0.85, 0.6, 0.95, 0.85],
+          "camera_coverage": ["CAM_FLOOR_01"],
+          "category": "skincare"
+        },
+        {
+          "zone_id": "BILLING",
+          "name": "Billing Counter",
+          "bbox": [0.85, 0.1, 0.98, 0.4],
+          "camera_coverage": ["CAM_BILLING_01"],
+          "category": "checkout"
+        },
+        {
+          "zone_id": "ENTRY",
+          "name": "Store Entry/Exit",
+          "bbox": [0.0, 0.4, 0.05, 0.6],
+          "camera_coverage": ["CAM_ENTRY_01"],
+          "category": "entrance"
+        }
+      ],
+      "cameras": [
+        {
+          "camera_id": "CAM_ENTRY_01",
+          "name": "Entry Camera",
+          "type": "entry_exit",
+          "position": "entrance",
+          "coverage_zones": ["ENTRY"]
+        },
+        {
+          "camera_id": "CAM_FLOOR_01",
+          "name": "Main Floor Camera",
+          "type": "floor",
+          "position": "center_ceiling",
+          "coverage_zones": [
+            "MAYBELLINE", "LAKME", "FACES", "MARS_NYBAE",
+            "ALPS_GOODNESS", "LOREAL", "BEAUTY_ESSENTIALS", "ACCESSORIES",
+            "AQUALOGICA", "TFS", "GOOD_VIBES", "DERMDOC", "FOXTALE", "MINIMALIST"
+          ]
+        },
+        {
+          "camera_id": "CAM_BILLING_01",
+          "name": "Billing Camera",
+          "type": "billing",
+          "position": "billing_area",
+          "coverage_zones": ["BILLING"]
+        }
+      ],
+      "open_hours": {
+        "monday": {"start": "10:00", "end": "22:00"},
+        "tuesday": {"start": "10:00", "end": "22:00"},
+        "wednesday": {"start": "10:00", "end": "22:00"},
+        "thursday": {"start": "10:00", "end": "22:00"},
+        "friday": {"start": "10:00", "end": "22:00"},
+        "saturday": {"start": "10:00", "end": "22:00"},
+        "sunday": {"start": "10:00", "end": "22:00"}
+      },
+      "metadata": {
+        "floor_area_sqm": 150,
+        "staff_count": 8,
+        "billing_counters": 2
+      }
+    }
+  ]
+}

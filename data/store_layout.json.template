@@ -1,0 +1,66 @@
+{
+  "stores": [
+    {
+      "store_id": "STORE_BLR_002",
+      "name": "Bangalore Store 2",
+      "zones": [
+        {
+          "zone_id": "SKINCARE",
+          "name": "Skincare Section",
+          "bbox": [
+            0.1,
+            0.2,
+            0.4,
+            0.6
+          ],
+          "camera_coverage": [
+            "CAM_FLOOR_01"
+          ]
+        },
+        {
+          "zone_id": "HAIRCARE",
+          "name": "Haircare Section",
+          "bbox": [
+            0.4,
+            0.2,
+            0.7,
+            0.6
+          ],
+          "camera_coverage": [
+            "CAM_FLOOR_01"
+          ]
+        },
+        {
+          "zone_id": "MAKEUP",
+          "name": "Makeup Section",
+          "bbox": [
+            0.1,
+            0.6,
+            0.4,
+            0.9
+          ],
+          "camera_coverage": [
+            "CAM_FLOOR_01"
+          ]
+        },
+        {
+          "zone_id": "BILLING",
+          "name": "Billing Counter",
+          "bbox": [
+            0.7,
+            0.1,
+            0.9,
+            0.3
+          ],
+          "camera_coverage": [
+            "CAM_BILLING_01"
+          ]
+        }
+      ],
+      "open_hours": {
+        "start": "10:00",
+        "end": "22:00"
+      }
+    }
+  ]
+}
