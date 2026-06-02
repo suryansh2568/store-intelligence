@@ -8,11 +8,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import os
+import time
 
 # Configuration
-API_URL = os.getenv("API_URL", "http://api:8000")
-# For production, use: API_URL = os.getenv("API_URL", "https://your-api.railway.app")
+API_URL = os.getenv("API_URL", "https://store-intelligence-api.onrender.com")
 DEFAULT_STORE = "STORE_BLR_002"
+WAKE_UP_TIMEOUT = 120  # seconds to wait for API to wake up
 
 # Page config
 st.set_page_config(
@@ -21,6 +22,79 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# ── Wake-up gate ────────────────────────────────────────────────────────────────
+def _is_api_alive() -> bool:
+    """Return True if the API responds with 200."""
+    try:
+        r = requests.get(f"{API_URL}/health", timeout=8)
+        return r.status_code == 200
+    except Exception:
+        return False
+
+def wake_up_api():
+    """
+    Block in a loading screen until the API is alive.
+    Returns immediately if the API is already up.
+    Render free-tier services spin down after inactivity; this pings them
+    awake so the user never has to open the API URL manually.
+    """
+    if _is_api_alive():
+        return  # already up – no loading screen needed
+
+    # Show loading UI
+    st.markdown("""
+    <style>
+        .wake-title  { font-size:2rem; font-weight:700; text-align:center; margin-top:3rem; }
+        .wake-sub    { font-size:1.1rem; color:#666; text-align:center; margin-bottom:2rem; }
+        .wake-note   { font-size:0.85rem; color:#999; text-align:center; }
+    </style>
+    <div class="wake-title">🏪 Store Intelligence</div>
+    <div class="wake-sub">Waking up the API — this takes about 30–60 seconds on first load.</div>
+    <div class="wake-note">Render free tier spins down idle services. Hang tight!</div>
+    """, unsafe_allow_html=True)
+
+    progress_bar = st.progress(0, text="Connecting to API…")
+    status_text  = st.empty()
+
+    deadline = time.time() + WAKE_UP_TIMEOUT
+    attempt  = 0
+
+    while time.time() < deadline:
+        attempt += 1
+        elapsed  = WAKE_UP_TIMEOUT - (deadline - time.time())
+        pct      = min(int(elapsed / WAKE_UP_TIMEOUT * 100), 95)
+
+        status_text.markdown(
+            f"<p style='text-align:center;color:#555;'>Attempt {attempt} — "
+            f"elapsed {int(elapsed)}s / {WAKE_UP_TIMEOUT}s…</p>",
+            unsafe_allow_html=True,
+        )
+        progress_bar.progress(pct, text=f"Waiting for API… ({int(elapsed)}s)")
+
+        if _is_api_alive():
+            progress_bar.progress(100, text="✅ API is live!")
+            status_text.markdown(
+                "<p style='text-align:center;color:green;font-weight:600;'>"
+                "API is up! Loading dashboard…</p>",
+                unsafe_allow_html=True,
+            )
+            time.sleep(0.8)
+            st.rerun()
+
+        time.sleep(4)  # poll every 4 seconds
+
+    # Timed out
+    progress_bar.progress(100, text="⚠️ Timed out")
+    st.error(
+        f"Could not reach the API at `{API_URL}` within {WAKE_UP_TIMEOUT}s. "
+        "Try refreshing the page, or check the Render dashboard."
+    )
+    st.stop()
+
+# Run the wake-up gate before anything else
+wake_up_api()
+# ────────────────────────────────────────────────────────────────────────────────
 
 # Custom CSS
 st.markdown("""
@@ -46,10 +120,10 @@ st.markdown("""
 def fetch_health():
     """Fetch system health."""
     try:
-        response = requests.get(f"{API_URL}/health", timeout=5)
+        response = requests.get(f"{API_URL}/health", timeout=15)
         if response.status_code == 200:
             return response.json()
-    except:
+    except Exception:
         pass
     return None
 
@@ -60,10 +134,10 @@ def fetch_metrics(store_id, date=None):
         url = f"{API_URL}/stores/{store_id}/metrics"
         if date:
             url += f"?date={date}"
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=15)
         if response.status_code == 200:
             return response.json()
-    except:
+    except Exception:
         pass
     return None
 
@@ -74,11 +148,10 @@ def fetch_heatmap(store_id, date=None):
         url = f"{API_URL}/stores/{store_id}/heatmap"
         if date:
             url += f"?date={date}"
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=15)
         if response.status_code == 200:
             return response.json()
-    except Exception as e:
-        # Log error but don't show to user unless in debug mode
+    except Exception:
         pass
     return None
 
@@ -89,10 +162,10 @@ def fetch_funnel(store_id, date=None):
         url = f"{API_URL}/stores/{store_id}/funnel"
         if date:
             url += f"?date={date}"
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=15)
         if response.status_code == 200:
             return response.json()
-    except:
+    except Exception:
         pass
     return None
 
@@ -100,10 +173,10 @@ def fetch_funnel(store_id, date=None):
 def fetch_anomalies(store_id):
     """Fetch active anomalies."""
     try:
-        response = requests.get(f"{API_URL}/stores/{store_id}/anomalies", timeout=5)
+        response = requests.get(f"{API_URL}/stores/{store_id}/anomalies", timeout=15)
         if response.status_code == 200:
             return response.json()
-    except:
+    except Exception:
         pass
     return None
 
@@ -157,10 +230,13 @@ def main():
         st.caption(f"Last updated: {datetime.now().strftime('%H:%M:%S')}")
     
     # Main content
+    # The wake_up_api() gate above already confirmed the API is live,
+    # but we still handle the (rare) case where it goes down mid-session.
     if not health:
-        st.error("🔴 Cannot connect to API. Please check if the API service is running.")
-        st.code(f"API URL: {API_URL}")
-        st.info("Try: docker-compose restart api")
+        st.error("🔴 Lost connection to the API. Please refresh the page.")
+        if st.button("🔄 Refresh"):
+            st.cache_data.clear()
+            st.rerun()
         return
     
     # Fetch data
@@ -272,20 +348,22 @@ def main():
                     for zone in zones
                 ])
             
-            # Bar chart for visits
-            fig_visits = px.bar(
-                zones_df,
-                x="Zone",
-                y="Visits",
-                title="Zone Visit Count",
-                color="Visits",
-                color_continuous_scale="Blues"
-            )
-            fig_visits.update_layout(showlegend=False)
-            st.plotly_chart(fig_visits, use_container_width=True)
-            
-            # Display table
-            st.dataframe(zones_df, use_container_width=True, hide_index=True)
+                # Bar chart for visits
+                fig_visits = px.bar(
+                    zones_df,
+                    x="Zone",
+                    y="Visits",
+                    title="Zone Visit Count",
+                    color="Visits",
+                    color_continuous_scale="Blues"
+                )
+                fig_visits.update_layout(showlegend=False)
+                st.plotly_chart(fig_visits, use_container_width=True)
+                
+                # Display table
+                st.dataframe(zones_df, use_container_width=True, hide_index=True)
+            else:
+                st.info("No zone data available for this date")
         else:
             st.info("No zone data available")
     
@@ -353,6 +431,8 @@ def main():
             with col3:
                 queue_to_purchase = funnel_data.get('queue_to_purchase_rate', 0) if isinstance(funnel_data, dict) else 0
                 st.metric("Queue → Purchase", f"{queue_to_purchase*100:.1f}%")
+        else:
+            st.info("No funnel data available for this date")
     else:
         st.info("No funnel data available")
     
